@@ -493,7 +493,8 @@ c = Community([RI,FP, BH], metabolome, metabolome_c)
 if stl.checkbox('PeriodicFeed'):
     interval = stl.slider('Feed interval', 1, 100, 12)
     dilution1 = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
-    simul=c.PeriodicFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution1)
+    simulTpf = stl.slider('SimulTime(p.f)', 0, 10000, 100)
+    simul=c.PeriodicFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution1, t_end = simulTpf)
     
     stl.write('### Community')
     
@@ -503,7 +504,8 @@ if stl.checkbox('PeriodicFeed'):
     
 if stl.checkbox('Chemostat'):
     dilution2 = stl.slider('Dilution(Periodic)', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
-    simul=c.simulate(c.chemostat_dynamics, dilution=dilution2, t_end=100)
+    simulTC = stl.slider('SimulTime(chms)', 0, 10000, 100)
+    simul=c.simulate(c.chemostat_dynamics, dilution=dilution2, t_end=simulTC)
 
     stl.write('### Community')
     stl.line_chart(c.community_dyn)
@@ -511,11 +513,10 @@ if stl.checkbox('Chemostat'):
     stl.line_chart(c.environment_dyn)    
     
 if stl.checkbox('Batch'):
-    simul=c.simulate(c.batch_dynamics)
+    simulB = stl.slider('SimulTime(Batch)', 0, 10000, 100)
+    simul=c.simulate(c.batch_dynamics, t_end=simulB)
 
     stl.write('### Community')
     stl.line_chart(c.community_dyn)
     stl.write('### Compounds')
     stl.line_chart(c.environment_dyn)    
-
-
