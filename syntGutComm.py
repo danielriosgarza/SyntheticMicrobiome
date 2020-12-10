@@ -205,14 +205,50 @@ class Community:
         
         return dyn
     
+    def chemostat_dynamics(self, t,y, dilution=.1, feed=None):
+        """ 
+        Definitions of the ODE's 
+        
+        """
+        
+        
+        if feed is None:
+            feed=self.metabolome_c
+        
+        
+        x=y[0:self.nstrains]
+        x-=x*dilution
+        s=y[self.nstrains:self.ndims]
+        s-=s*dilution
+        s+=feed*dilution
+        
+        q=y[self.ndims:]
+        
+        growth = self.growthRates(s,q)
+        #print(growth)
+        
+        dyn_x = (np.array([sum(i) for i in growth])*x)   
+        
+
+        dyn_s = (sum([-self.feeding_m[i].dot(growth[i]*x[i]) for i in range(self.nstrains)])) 
+        
+        
+        
+        dyn_q = self.mus*q*(q<10.**5)    # Lag phase: ignore this once q > 10.**5
+        
+        dyn = np.append(dyn_x,np.append(dyn_s,dyn_q))
+        
+        return dyn
+    
    
 
-    def simulate(self, dynamics, t_start=0, t_end = 50, nsteps = 1000, method = 'bdf'):
+    def simulate(self, dynamics, t_start=0, t_end = 50, nsteps = 1000, method = 'bdf', dilution=None):
         """ 
         Simulate the ODE's 
         
         """
         # Solve ODE
+        
         ode = solver.ode(dynamics)
         
         # BDF method suited to stiff systems of ODEs
@@ -225,6 +261,8 @@ class Community:
        
         t_step = (t_end - t_start)/nsteps
         
+        if dilution is not None:
+            ode.set_f_params(dilution)
         ode.set_initial_value(y_init,t_start)
         
         ts = []
@@ -253,7 +291,7 @@ class Community:
         self.environment_dyn.index=time
     
     
-    def batchFeed_simulate(self, dynamics, t_start=0, t_end = 100, nsteps = 1000, method = 'bdf', feed_interval=1, feed_proportion=.01):
+    def batchFeed_simulate(self, dynamics, t_start=0, t_end = 100, nsteps = 1000, method = 'bdf', feed_interval=1, dilution=.01):
         """ 
         Simulate the ODE's 
         
@@ -273,20 +311,19 @@ class Community:
         
         ode.set_initial_value(y_init,t_start)
         
-        ts = []
-        ys = []
+        ts = [0]
+        ys = [y_init]
         
         time = t_start
         btime=[]
         while ode.successful() and ode.t < t_end:
-            if time>1:
-                if np.round(time)%feed_interval==0:
-                    if np.round(time) not in btime:
-                        btime.append(np.round(time))
-                        print(time)
-                        rout = np.append(np.ones(self.nstrains)*(1-feed_proportion), np.append(np.ones(self.nmets)*(1-feed_proportion), np.ones(self.nstrains)))
-                        cy = (ys[-1]*rout) + np.append(np.zeros(self.nstrains), np.append(self.metabolome_c*feed_proportion, np.zeros(self.nstrains)))
-                        print(cy)
+            if np.round(time)%feed_interval==0:
+                if np.round(time) not in btime:
+                    btime.append(np.round(time))
+                    print(time)
+                    rout = np.append(np.ones(self.nstrains)*(1-dilution), np.append(np.ones(self.nmets)*(1-dilution), np.ones(self.nstrains)))
+                    cy = (ys[-1]*rout) + np.append(np.zeros(self.nstrains), np.append(self.metabolome_c*dilution, np.zeros(self.nstrains)))
+                    print(btime)
                     ode.set_initial_value(cy, ode.t)
             time+=t_step
                 
@@ -312,6 +349,9 @@ class Community:
         self.community_dyn.index=time
         self.environment_dyn = pd.DataFrame.from_dict(environment_dyn)
         self.environment_dyn.index=time
+    
+    
+    
     
 
 
@@ -438,15 +478,30 @@ c = Community([RI,FP, BH], metabolome, metabolome_c)
 
 if stl.checkbox('BatchFeed'):
     interval = stl.slider('Feed interval', 1, 100, 12)
-    prop = stl.slider('Feed proportion', 0.0, 1.0, 0.25, step=0.001, format='%.3f')
-    simul=c.batchFeed_simulate(c.batch_dynamics, feed_interval=interval, feed_proportion=prop)
-
-else:
-    simul=c.simulate(c.batch_dynamics)
+    dilution = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
+    simul=c.batchFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution)
     
+    stl.write('### Community')
+    
+    stl.line_chart(c.community_dyn)
+    stl.write('### Compounds')
+    stl.line_chart(c.environment_dyn)
+    
+elif stl.checkbox('Chemostat'):
+    dilution = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
+    simul=c.simulate(c.chemostat_dynamics, dilution=dilution)
+
+    stl.write('### Community')
+    stl.line_chart(c.community_dyn)
+    stl.write('### Compounds')
+    stl.line_chart(c.environment_dyn)    
+    
+elif stl.checkbox('Batch'):
+    simul=c.simulate(c.batch_dynamics)
+
+    stl.write('### Community')
+    stl.line_chart(c.community_dyn)
+    stl.write('### Compounds')
+    stl.line_chart(c.environment_dyn)    
 
 
-stl.write('### Community')
-stl.line_chart(c.community_dyn)
-stl.write('### Compounds')
-stl.line_chart(c.environment_dyn)
