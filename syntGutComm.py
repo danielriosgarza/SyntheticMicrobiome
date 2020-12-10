@@ -192,6 +192,8 @@ class Community:
         s=y[self.nstrains:self.ndims]
         q=y[self.ndims:]
         
+        x=x*(x>0)
+        s=s*(s>0)
         growth = self.growthRates(s,q)
         #print(growth)
         
@@ -217,20 +219,32 @@ class Community:
         
         
         x=y[0:self.nstrains]
-        x-=x*dilution
-        s=y[self.nstrains:self.ndims]
-        s-=s*dilution
-        s+=feed*dilution
         
+        s=y[self.nstrains:self.ndims]
+        
+        
+        
+        
+        #s+=feed*dilution
+        
+        
+        x=x*(x>0)
+        s=s*(s>0)
+        print(s)
         q=y[self.ndims:]
         
         growth = self.growthRates(s,q)
         #print(growth)
-        
-        dyn_x = (np.array([sum(i) for i in growth])*x)   
+        #s+=s*dilution
+        dyn_x = (np.array([sum(i) for i in growth])*x)-dilution*x
         
 
-        dyn_s = (sum([-self.feeding_m[i].dot(growth[i]*x[i]) for i in range(self.nstrains)])) 
+        dyn_s = (sum([-self.feeding_m[i].dot(growth[i]*x[i]) for i in range(self.nstrains)]))-dilution*s+ dilution*feed
+        #dyn_s-=dyn_s*dilution
+        #dyn_s=dyn_s*(dyn_s>0)
+        
+        #dyn_s += feed*dilution
+        
         
         
         
@@ -478,8 +492,8 @@ c = Community([RI,FP, BH], metabolome, metabolome_c)
 
 if stl.checkbox('PeriodicFeed'):
     interval = stl.slider('Feed interval', 1, 100, 12)
-    dilution = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
-    simul=c.PeriodicFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution)
+    dilution1 = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
+    simul=c.PeriodicFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution1)
     
     stl.write('### Community')
     
@@ -487,16 +501,16 @@ if stl.checkbox('PeriodicFeed'):
     stl.write('### Compounds')
     stl.line_chart(c.environment_dyn)
     
-elif stl.checkbox('Chemostat'):
-    dilution = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
-    simul=c.simulate(c.chemostat_dynamics, dilution=dilution)
+if stl.checkbox('Chemostat'):
+    dilution2 = stl.slider('Dilution(Periodic)', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
+    simul=c.simulate(c.chemostat_dynamics, dilution=dilution2, t_end=100)
 
     stl.write('### Community')
     stl.line_chart(c.community_dyn)
     stl.write('### Compounds')
     stl.line_chart(c.environment_dyn)    
     
-elif stl.checkbox('Batch'):
+if stl.checkbox('Batch'):
     simul=c.simulate(c.batch_dynamics)
 
     stl.write('### Community')
