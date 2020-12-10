@@ -437,8 +437,8 @@ c = Community([RI,FP, BH], metabolome, metabolome_c)
 #simualate
 
 if stl.checkbox('BatchFeed'):
-    interval = stl.slider('Feed interval', 1, 100, 5)
-    prop = stl.slider('Feed proportion', 0.0, 1.0, 0.1, step=0.001, format='%.3f')
+    interval = stl.slider('Feed interval', 1, 100, 12)
+    prop = stl.slider('Feed proportion', 0.0, 1.0, 0.25, step=0.001, format='%.3f')
     simul=c.batchFeed_simulate(c.batch_dynamics, feed_interval=interval, feed_proportion=prop)
 
 else:
