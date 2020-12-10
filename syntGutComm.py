@@ -490,32 +490,32 @@ c = Community([RI,FP, BH], metabolome, metabolome_c)
 
 #simualate
 
-if stl.checkbox('PeriodicFeed'):
-    interval = stl.slider('Feed interval', 1, 100, 12)
-    dilution1 = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
-    simul=c.PeriodicFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution1)
+# if stl.checkbox('PeriodicFeed'):
+#     interval = stl.slider('Feed interval', 1, 100, 12)
+#     dilution1 = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
+#     simul=c.PeriodicFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution1)
     
-    stl.write('### Community')
+#     stl.write('### Community')
     
-    stl.line_chart(c.community_dyn)
-    stl.write('### Compounds')
-    stl.line_chart(c.environment_dyn)
+#     stl.line_chart(c.community_dyn)
+#     stl.write('### Compounds')
+#     stl.line_chart(c.environment_dyn)
     
-if stl.checkbox('Chemostat'):
-    dilution2 = stl.slider('Dilution(Periodic)', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
-    simul=c.simulate(c.chemostat_dynamics, dilution=dilution2, t_end=100)
+# if stl.checkbox('Chemostat'):
+#     dilution2 = stl.slider('Dilution(Periodic)', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
+#     simul=c.simulate(c.chemostat_dynamics, dilution=dilution2, t_end=100)
 
-    stl.write('### Community')
-    stl.line_chart(c.community_dyn)
-    stl.write('### Compounds')
-    stl.line_chart(c.environment_dyn)    
+#     stl.write('### Community')
+#     stl.line_chart(c.community_dyn)
+#     stl.write('### Compounds')
+#     stl.line_chart(c.environment_dyn)    
     
-if stl.checkbox('Batch'):
-    simul=c.simulate(c.batch_dynamics)
+# if stl.checkbox('Batch'):
+#     simul=c.simulate(c.batch_dynamics)
 
-    stl.write('### Community')
-    stl.line_chart(c.community_dyn)
-    stl.write('### Compounds')
-    stl.line_chart(c.environment_dyn)    
+#     stl.write('### Community')
+#     stl.line_chart(c.community_dyn)
+#     stl.write('### Compounds')
+#     stl.line_chart(c.environment_dyn)    
 
 
