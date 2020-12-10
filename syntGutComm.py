@@ -291,7 +291,7 @@ class Community:
         self.environment_dyn.index=time
     
     
-    def batchFeed_simulate(self, dynamics, t_start=0, t_end = 100, nsteps = 1000, method = 'bdf', feed_interval=1, dilution=.01):
+    def PeriodicFeed_simulate(self, dynamics, t_start=0, t_end = 100, nsteps = 1000, method = 'bdf', feed_interval=1, dilution=.01):
         """ 
         Simulate the ODE's 
         
@@ -476,10 +476,10 @@ c = Community([RI,FP, BH], metabolome, metabolome_c)
 
 #simualate
 
-if stl.checkbox('BatchFeed'):
+if stl.checkbox('PeriodicFeed'):
     interval = stl.slider('Feed interval', 1, 100, 12)
     dilution = stl.slider('Dilution', 0.0, 1.0, 0.25, step=0.0001, format='%.4f')
-    simul=c.batchFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution)
+    simul=c.PeriodicFeed_simulate(c.batch_dynamics, feed_interval=interval, dilution=dilution)
     
     stl.write('### Community')
     
