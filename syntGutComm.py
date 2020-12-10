@@ -230,7 +230,7 @@ class Community:
         
         x=x*(x>0)
         s=s*(s>0)
-        print(s)
+        #print(s)
         q=y[self.ndims:]
         
         growth = self.growthRates(s,q)
@@ -334,10 +334,10 @@ class Community:
             if np.round(time)%feed_interval==0:
                 if np.round(time) not in btime:
                     btime.append(np.round(time))
-                    print(time)
+                    #print(time)
                     rout = np.append(np.ones(self.nstrains)*(1-dilution), np.append(np.ones(self.nmets)*(1-dilution), np.ones(self.nstrains)))
                     cy = (ys[-1]*rout) + np.append(np.zeros(self.nstrains), np.append(self.metabolome_c*dilution, np.zeros(self.nstrains)))
-                    print(btime)
+                    #print(btime)
                     ode.set_initial_value(cy, ode.t)
             time+=t_step
                 
