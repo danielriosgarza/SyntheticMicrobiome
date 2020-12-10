@@ -1,7 +1,3 @@
-python -m pip install numpy            # latest version
-python -m pip install scipy            # latest version
-python -m pip install pandas            # latest version
-python -m pip install     # specific version
 numpy
 scipy
 pandas
